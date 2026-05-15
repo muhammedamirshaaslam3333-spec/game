@@ -34,6 +34,8 @@ function jump() {
 // GAME OVER
 function gameOver() {
 
+  if (!gameRunning) return;
+
   gameRunning = false;
 
   // STOP CACTUS
@@ -43,7 +45,7 @@ function gameOver() {
   jumpSound.pause();
   jumpSound.currentTime = 0;
 
-  // PLAY HIT SOUND ONCE
+  // PLAY HIT SOUND
   hitSound.pause();
   hitSound.currentTime = 0;
   hitSound.play();
@@ -61,9 +63,6 @@ function restartGame() {
   hitSound.pause();
   hitSound.currentTime = 0;
 
-  // IMPORTANT FIX
-  hitSound.load();
-
   // RESET GAME
   score = 0;
 
@@ -73,10 +72,9 @@ function restartGame() {
 
   gameOverText.style.display = "none";
 
-  // RESET CACTUS ANIMATION
+  // RESET CACTUS POSITION
   cactus.style.animation = "none";
 
-  // FORCE REFLOW
   void cactus.offsetWidth;
 
   cactus.style.animation = "moveCactus 2s linear infinite";
@@ -113,7 +111,7 @@ document.body.addEventListener("touchstart", (e) => {
 
   handleAction();
 
-}, { passive:false });
+}, { passive: false });
 
 // CLICK SUPPORT
 document.body.addEventListener("click", () => {
@@ -122,23 +120,20 @@ document.body.addEventListener("click", () => {
 
 });
 
-// COLLISION CHECK
+// COLLISION DETECTION
 setInterval(() => {
 
   if (!gameRunning) return;
 
-  const dinoBottom =
-    parseInt(window.getComputedStyle(dino)
-    .getPropertyValue("bottom"));
+  const dinoRect = dino.getBoundingClientRect();
+  const cactusRect = cactus.getBoundingClientRect();
 
-  const cactusLeft =
-    parseInt(window.getComputedStyle(cactus)
-    .getPropertyValue("left"));
-
-  // HIT DETECTION
-  if (cactusLeft < 100 &&
-      cactusLeft > 40 &&
-      dinoBottom < 50) {
+  // CHECK COLLISION
+  if (
+    dinoRect.right > cactusRect.left &&
+    dinoRect.left < cactusRect.right &&
+    dinoRect.bottom > cactusRect.top
+  ) {
 
     gameOver();
 
