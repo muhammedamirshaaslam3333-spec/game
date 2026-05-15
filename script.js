@@ -12,7 +12,6 @@ let gameRunning = true;
 // Jump Function
 function jump() {
 
-  // Prevent jumping after game over
   if (!gameRunning) return;
 
   // Prevent double jump
@@ -20,7 +19,7 @@ function jump() {
 
     dino.classList.add("jump");
 
-    // Play jump sound ONLY here
+    // Jump sound
     jumpSound.pause();
     jumpSound.currentTime = 0;
     jumpSound.play();
@@ -29,61 +28,6 @@ function jump() {
       dino.classList.remove("jump");
     }, 600);
   }
-}
-
-// Key Press
-document.addEventListener("keydown", (e) => {
-
-  if (e.code === "Space") {
-
-    if (!gameRunning) {
-      restartGame();
-    } else {
-      jump();
-    }
-  }
-});
-
-// Collision Detection
-let checkCollision = setInterval(() => {
-
-  if (!gameRunning) return;
-
-  const dinoTop =
-    parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
-
-  const cactusLeft =
-    parseInt(window.getComputedStyle(cactus).getPropertyValue("left"));
-
-  // Collision
-  if (cactusLeft < 100 && cactusLeft > 40 && dinoTop < 50) {
-
-    gameOver();
-
-  } else {
-
-    score++;
-    scoreText.innerText = "Score: " + score;
-  }
-
-}, 100);
-
-// Game Over
-function gameOver() {
-
-  gameRunning = false;
-
-  cactus.style.animation = "none";
-
-  // Stop jump sound immediately
-  jumpSound.pause();
-  jumpSound.currentTime = 0;
-
-  // Play hit sound
-  hitSound.currentTime = 0;
-  hitSound.play();
-
-  gameOverText.style.display = "block";
 }
 
 // Restart Game
@@ -97,4 +41,75 @@ function restartGame() {
   cactus.style.animation = "moveCactus 2s linear infinite";
 
   gameOverText.style.display = "none";
+}
+
+// Handle Action (Jump / Restart)
+function handleAction() {
+
+  if (!gameRunning) {
+    restartGame();
+  } else {
+    jump();
+  }
+}
+
+// PC Keyboard Support
+document.addEventListener("keydown", (e) => {
+
+  if (e.code === "Space") {
+
+    e.preventDefault();
+
+    handleAction();
+  }
+});
+
+// Mobile Touch Support
+document.addEventListener("touchstart", () => {
+
+  handleAction();
+
+});
+
+// Collision Detection
+let checkCollision = setInterval(() => {
+
+  if (!gameRunning) return;
+
+  const dinoTop =
+    parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
+
+  const cactusLeft =
+    parseInt(window.getComputedStyle(cactus).getPropertyValue("left"));
+
+  // Collision Detection
+  if (cactusLeft < 100 && cactusLeft > 40 && dinoTop < 50) {
+
+    gameOver();
+
+  } else {
+
+    score++;
+
+    scoreText.innerText = "Score: " + score;
+  }
+
+}, 100);
+
+// Game Over
+function gameOver() {
+
+  gameRunning = false;
+
+  cactus.style.animation = "none";
+
+  // Stop jump sound
+  jumpSound.pause();
+  jumpSound.currentTime = 0;
+
+  // Play hit sound
+  hitSound.currentTime = 0;
+  hitSound.play();
+
+  gameOverText.style.display = "block";
 }
